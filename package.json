@@ -1,0 +1,25 @@
+{
+  "name": "elm-cognito",
+  "version": "1.0.0",
+  "description": "Elm Interop for AWS Cognito",
+  "author": "Perry Birch <perrybirch@asheworks.com>",
+  "license": "Apache 2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asheworks/elm-cognito"
+  },
+  "main": "app.js",
+  "scripts": {
+    "docs": "elm-make --docs=docs.json",
+    "build": "webpack",
+    "test": "jest --watch"
+  },
+  "dependencies": {
+    "amazon-cognito-identity-js": "^1.11.0"
+  },
+  "devDependencies": {
+    "jest-cli": "18.1.0",
+    "json-loader": "^0.5.4",
+    "webpack": "^1.14.0"
+  }
+}
