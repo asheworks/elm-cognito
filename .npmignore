@@ -1,0 +1,12 @@
+
+dist/
+elm-stuff/
+example/
+node_modules/
+src/
+tests/
+
+cognito.test.js
+credentials.js
+elm-package.json
+webpack.config.js

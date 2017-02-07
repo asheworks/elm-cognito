@@ -2,7 +2,7 @@ module.exports = {
   // Example setup for your project:
   // The entry module that requires or imports the rest of your project.
   // Must start with `./`!
-  entry: './js/cognito',
+  entry: './cognito',
   // Place output files in `./dist/app.js`
   output: {
     path: 'dist',

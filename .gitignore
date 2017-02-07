@@ -4,4 +4,4 @@ elm-stuff/
 node_modules/
 tests/elm-stuff/
 
-/tests/credentials.js
+credentials.js

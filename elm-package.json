@@ -4,9 +4,11 @@
     "repository": "https://github.com/asheworks/elm-cognito.git",
     "license": "Apache 2.0",
     "source-directories": [
-        "src"
+        "src",
+        "../elm-auth"
     ],
     "exposed-modules": [
+        "Cognito"
     ],
     "dependencies": {
         "elm-lang/core": "5.0.0 <= v < 6.0.0",
