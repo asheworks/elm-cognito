@@ -143,6 +143,7 @@ var config = {
 }
 */
 module.exports = function(config) {
+  console.log('Cognito config: ', config)
   return function(ports) {
     if (
       checkConfig(config)
@@ -172,14 +173,14 @@ module.exports = function(config) {
     methods =
       { changePassword: init(changePassword)
       , confirmRegistration: init(confirmRegistration)
-      , deleteUser: init(confirm)
-      , forgotPassword: init(confirm)
+      // , deleteUser: init(confirm)
+      // , forgotPassword: init(confirm)
       , logIn: init(logIn)
       , logOut: init(logOut)
       , passwordChallenge: init(passwordChallenge)
-      , resendConfirmationCode: init(confirm)
-      , resetPassword: init(confirm)
-      , signOut: init(confirm)
+      // , resendConfirmationCode: init(confirm)
+      // , resetPassword: init(confirm)
+      // , signOut: init(confirm)
       , signUp: init(signUp)
       }
     ports.cmd_AsheWorks_ElmCognito_LogIn.subscribe(methods.logIn)
