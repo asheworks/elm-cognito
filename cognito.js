@@ -96,8 +96,8 @@ function makeHandlers(ports) {
     , logIn :
       { error : ports.sub_AsheWorks_ElmCognito_LogInError.send
       , failure : ports.sub_AsheWorks_ElmCognito_LogInFailure.send
-      , mfaRequired : (data) => { console.log('logIn MFARequired: ', data) }
-      , newPasswordRequired : (data) => { console.log('logIn NewPasswordRequired: ', data) }
+      , mfaRequired : ports.sub_AsheWorks_ElmCognito_LogInMFARequired.send
+      , newPasswordRequired : ports.sub_AsheWorks_ElmCognito_LogInNewPasswordRequired.send
       , success : ports.sub_AsheWorks_ElmCognito_LogInSuccess.send
       }
     , logOut : 
@@ -130,6 +130,9 @@ function makeHandlers(ports) {
   return handler
 }
 
+// , mfaRequired : (data) => { console.log('logIn MFARequired: ', data) }
+// , newPasswordRequired : (data) => { console.log('logIn NewPasswordRequired: ', data) }
+
 /*
 example config:
 
@@ -143,7 +146,6 @@ var config = {
 }
 */
 module.exports = function(config) {
-  console.log('Cognito config: ', config)
   return function(ports) {
     if (
       checkConfig(config)
@@ -169,18 +171,20 @@ module.exports = function(config) {
     var init = function(func) {
       return func(_handler, _pool, _config)
     }
+    // console.log('CONFIRM', confirm)
+
     var methods = {}
     methods =
       { changePassword: init(changePassword)
       , confirmRegistration: init(confirmRegistration)
-      // , deleteUser: init(confirm)
-      // , forgotPassword: init(confirm)
+      , deleteUser: init(stub('deleteUser'))
+      , forgotPassword: init(stub('forgotPassword'))
       , logIn: init(logIn)
       , logOut: init(logOut)
       , passwordChallenge: init(passwordChallenge)
-      // , resendConfirmationCode: init(confirm)
-      // , resetPassword: init(confirm)
-      // , signOut: init(confirm)
+      , resendConfirmationCode: init(stub('resendConfirmationCode'))
+      , resetPassword: init(stub('resetPassword'))
+      , signOut: init(stub('signOut'))
       , signUp: init(signUp)
       }
     ports.cmd_AsheWorks_ElmCognito_LogIn.subscribe(methods.logIn)
@@ -217,6 +221,14 @@ function getCognitoUser(pool, data, config) {
 /*
 * Exposed methods
 */
+
+function stub(name) {
+  return function(handler, pool, config) {
+    return function (data)  {
+      console.log('Stub Method: ', name)
+    }
+  }
+}
 
 function changePassword(handler, pool, config) {
   return function (data)  {
@@ -372,7 +384,7 @@ function logIn(handler, pool, config) {
     try {
       console.log('Cognito log in: ', data)
       // let cognito = getCognitoUser(pool, data, cognito)
-      let cognito = getCognitoUser(pool, data, config)
+      let cognito = getCognitoUser(pool, data.credentials, config)
       let cbHandler = {}
       cbHandler = {
         onSuccess: (result) => {
@@ -390,14 +402,23 @@ function logIn(handler, pool, config) {
         },
         mfaRequired: (codeDeliveryDetails) => {
           // console.log('* mfa: ', codeDeliveryDetails)
-          handler.logIn.mfaRequired(codeDeliveryDetails)
+          handler.logIn.mfaRequired(''+codeDeliveryDetails)
         },
         newPasswordRequired: (userAttrs, requiredAttrs) => {
           // console.log('* requiredAttrs: ', requiredAttrs)
-          delete userAttrs.email_verified
-          delete userAttrs.phone_number_verified
+          console.log (' New Password Required: ', data)
+          if ( data.newPassword ) {
+            delete userAttrs.email_verified
+            delete userAttrs.phone_number_verified
+
+            cognito.user.completeNewPasswordChallenge(data.newPassword, userAttrs, cbHandler)
+          } else {
+            handler.logIn.newPasswordRequired('')
+          }
           
-          cognito.user.completeNewPasswordChallenge('@Password1', userAttrs, cbHandler)
+          
+          // cognito.user.completeNewPasswordChallenge('@Password1', userAttrs, cbHandler)
+          // cognito.user.completeNewPasswordChallenge(data.password, userAttrs, cbHandler)
         }
       }
       console.log('Calling authenticateUser')
@@ -408,6 +429,7 @@ function logIn(handler, pool, config) {
     }
   }
 }
+
 
 function logOut(handler, pool, config) {
   return function(data) {
