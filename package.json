@@ -2,7 +2,7 @@
   "name": "elm-cognito",
   "version": "1.0.0",
   "description": "Elm Interop for AWS Cognito",
-  "author": "Perry Birch <perrybirch@asheworks.com>",
+  "author": "Perry Birch <perry@ashelabs.com>",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -12,7 +12,8 @@
   "scripts": {
     "docs": "elm-make --docs=docs.json",
     "build": "webpack",
-    "test": "jest --watch"
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
   },

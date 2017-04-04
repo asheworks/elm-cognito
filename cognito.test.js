@@ -2,7 +2,13 @@
 
 var providerFunc = require('elm-cognito')
  
-var creds = require('./credentials')
+var creds =
+  { region: 'us-west-2'
+  , userPoolId: 'us-west-2_junkdata'
+  , clientId: 'abunchofjunkdata'
+  }
+
+// var creds = require('./credentials')
 
 /*
 
@@ -33,14 +39,18 @@ var cmd =
   }
 
 var mockPorts =
-  { cmd_AsheWorks_ElmCognito_PasswordChallenge : cmd
+  { cmd_AsheWorks_ElmCognito_LogIn : cmd
+  , sub_AsheWorks_ElmCognito_LogInError : noop
+  , sub_AsheWorks_ElmCognito_LogInFailure : noop
+  , sub_AsheWorks_ElmCognito_LogInMFARequired : noop
+  , sub_AsheWorks_ElmCognito_LogInNewPasswordRequired : noop
+  , sub_AsheWorks_ElmCognito_LogInSuccess : noop
+
+  , cmd_AsheWorks_ElmCognito_PasswordChallenge : cmd
   , sub_AsheWorks_ElmCognito_PasswordChallengeError : noop
   , sub_AsheWorks_ElmCognito_PasswordChallengeFailure : noop
   , sub_AsheWorks_ElmCognito_PasswordChallengeSuccess : noop
-  , cmd_AsheWorks_ElmCognito_LogIn : cmd
-  , sub_AsheWorks_ElmCognito_LogInError : noop
-  , sub_AsheWorks_ElmCognito_LogInFailure : noop
-  , sub_AsheWorks_ElmCognito_LogInSuccess : noop
+
   , cmd_AsheWorks_ElmCognito_SignUp : cmd
   , sub_AsheWorks_ElmCognito_SignUpError : noop
   , sub_AsheWorks_ElmCognito_SignUpFailure : noop
@@ -51,28 +61,8 @@ function getMockPorts(impl) {
   return Object.assign({}, mockPorts, impl)
 }
 
-// test('does stuff', () => {
-//   const service = cognito
-//     ( getMockHandler(
-//       { logIn :
-//         { success : (res) => { console.log('* login success: ', res) }
-//         , error : (err) => { console.log('* login error: ', err) }
-//         }
-//       }
-//     )
-//     , { region: 'us-west-2'
-//       , userPoolId: 'us-west-2_wUnhKNf1i'
-//       , clientId: 'dnpjkp19h2snr4ek0voht8j2n'
-//       }
-//     )
-//   service.logIn
-//     ( { username : 'test0001'
-//       , password : 'P@ssw0rd'
-//       }
-//     )
-// })
 
-test('does stuff', () => {
+test('simulate cognito calls', () => {
   const config =
       { creds: creds
       }
