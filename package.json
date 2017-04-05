@@ -12,10 +12,11 @@
   "scripts": {
     "docs": "elm-make --docs=docs.json",
     "build": "webpack",
-    "test": "jest",
+    "test": "jest && elm-test",
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "aws-sdk": "2.38.0"
   },
   "devDependencies": {
     "jest-cli": "18.1.0",

@@ -48,7 +48,7 @@ port sub_AsheWorks_ElmCognito_SignUpSuccess : (String -> msg) -> Sub msg
 
 effects : ( Auth.Model, Auth.Effect ) -> Cmd msg
 effects ( model, effect ) =
-    case Debug.log "- CP AUth" effect of
+    case effect of
         Auth.DoLogIn creds ->
             cmd_AsheWorks_ElmCognito_LogIn creds
 

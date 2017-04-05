@@ -3,10 +3,10 @@ module.exports = {
   // The entry module that requires or imports the rest of your project.
   // Must start with `./`!
   entry: './cognito',
-  // Place output files in `./dist/app.js`
+  // Place output files in `./dist/cognito.js`
   output: {
     path: 'dist',
-    filename: 'app.js'
+    filename: 'cognito.js'
   },
   module: {
     loaders: [
