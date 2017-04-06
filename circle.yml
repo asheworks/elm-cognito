@@ -2,7 +2,6 @@ machine:
   pre:
     - npm install --silent -g elm@0.18.0
     - npm install -g elm-test
-    - npm install
 
 dependencies:
   cache_directories:
@@ -12,6 +11,7 @@ dependencies:
     - elm package install -y
     - chmod +x ./scripts/ci-elm-hack.sh
     - ./scripts/ci-elm-hack.sh
+    - npm install
 
 test:
   pre:
