@@ -9,7 +9,7 @@ dependencies:
     - elm-stuff
   override:
     - elm package install -y
-    - sudo bash ./scripts/ci-elm-hack.sh
+    - sudo sh ./scripts/ci-elm-hack.sh
 
 test:
   pre:
