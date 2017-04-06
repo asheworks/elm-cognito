@@ -2,7 +2,7 @@ machine:
   pre:
     - npm install --silent -g elm@0.18.0
     - npm install -g elm-test
-    - npm install --silent
+    - npm install
 
 dependencies:
   cache_directories:
