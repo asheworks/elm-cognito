@@ -2,13 +2,13 @@
 
 var providerFunc = require('elm-cognito')
  
-var creds =
+var creds = {}
+
+creds =
   { region: 'us-west-2'
   , userPoolId: 'us-west-2_junkdata'
   , clientId: 'abunchofjunkdata'
   }
-
-// var creds = require('./credentials')
 
 /*
 
@@ -25,16 +25,17 @@ module.exports =
   }
 */
 
-//var noop = () => {}
+creds = require('./credentials')
+
 var noop =
   { send : () =>
-    { console.log('noop')
+    { // console.log('noop')
     }
   }
 
 var cmd =
   { subscribe : () =>
-    { console.log('command')
+    { // console.log('command')
     }
   }
 
@@ -102,7 +103,7 @@ test('simulate cognito calls', () => {
       }
     )
   )
-    
+  service.changePassword( {} )
   service.logIn
     ( { username : 'test0001'
       , password : '@Password1'

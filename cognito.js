@@ -72,26 +72,38 @@ function checkSignOut(obj) {
     check(obj.signOut.complete)
 }
 
-var noop = () => { console.log('Elm-Cognito NOOP') }
+function notYetImplemented(method) {
+  return function() {
+    console.log('Method Not Yet Implementd [ ' + method + ' ]')
+  }
+}
+
+function stub(name) {
+  return function(handler, pool, config) {
+    return function (data)  {
+      console.log('Stub Method: ', name)
+    }
+  }
+}
 
 function makeHandlers(ports) {
   var handler =
     { changePassword :
-      { error : noop
-      , failure : noop
-      , success : noop
+      { error : notYetImplemented('changePassword - error')
+      , failure : notYetImplemented('changePassword - failure')
+      , success : notYetImplemented('changePassword - success')
       }
     , confirmRegistration :
-      { error : noop
-      , success : noop
+      { error : notYetImplemented('confirmRegistration - error')
+      , success : notYetImplemented('confirmRegistration - success')
       }
     , deleteUser :
-      { error : noop
-      , success : noop
+      { error : notYetImplemented('deleteUser - error')
+      , success : notYetImplemented('deleteUser - success')
       }
     , forgotPassword :
-      { error : noop
-      , success : noop
+      { error : notYetImplemented('forgotPassword - error')
+      , success : notYetImplemented('forgotPassword - success')
       }
     , logIn :
       { error : ports.sub_AsheWorks_ElmCognito_LogInError.send
@@ -101,8 +113,8 @@ function makeHandlers(ports) {
       , success : ports.sub_AsheWorks_ElmCognito_LogInSuccess.send
       }
     , logOut : 
-      { error : noop
-      , success : noop
+      { error : notYetImplemented('logOut - error')
+      , success : notYetImplemented('logOut - success')
       }
     , passwordChallenge :
       { error : ports.sub_AsheWorks_ElmCognito_PasswordChallengeError.send
@@ -110,15 +122,15 @@ function makeHandlers(ports) {
       , success : ports.sub_AsheWorks_ElmCognito_PasswordChallengeSuccess.send
       }
     , resendConfirmationCode :
-      { error : noop
-      , success : noop
+      { error : notYetImplemented('resendConfirmationCode - error')
+      , success : notYetImplemented('resendConfirmationCode - success')
       }
     , resetPassword :
-      { error : noop
-      , success : noop
+      { error : notYetImplemented('resetPassword - error')
+      , success : notYetImplemented('resetPassword - success')
       }
     , signOut :
-      { complete : noop
+      { complete : notYetImplemented('signOut - complete')
       }
     , signUp :
       { error : ports.sub_AsheWorks_ElmCognito_SignUpError.send
@@ -130,8 +142,6 @@ function makeHandlers(ports) {
   return handler
 }
 
-// , mfaRequired : (data) => { console.log('logIn MFARequired: ', data) }
-// , newPasswordRequired : (data) => { console.log('logIn NewPasswordRequired: ', data) }
 
 /*
 example config:
@@ -168,10 +178,20 @@ module.exports = function(config) {
       }
     var _pool = new CognitoUserPool(poolData)
 
+    var user = _pool.getCurrentUser()
+    // if (user != null) {
+    //   user.getSession(function(err, session) {
+    //     if (err) {
+    //       alert(err)
+    //       return
+    //     }
+    //     //alert('session: ', session, session.isValid())
+    //   })
+    // }
+
     var init = function(func) {
       return func(_handler, _pool, _config)
     }
-    // console.log('CONFIRM', confirm)
 
     var methods = {}
     methods =
@@ -202,12 +222,12 @@ function getCognitoUser(pool, data, config) {
     ) {
       throw new Error('missing user name or password')
     }
-  let authData = {
+  var authData = {
     Username: data.username,
     Password: data.password
   }
-  let authDetails = new AmazonCognitoIdentity.AuthenticationDetails(authData);
-  let userData = {
+  var authDetails = new AmazonCognitoIdentity.AuthenticationDetails(authData);
+  var userData = {
     Username: data.username,
     Pool: pool
   }
@@ -222,14 +242,6 @@ function getCognitoUser(pool, data, config) {
 * Exposed methods
 */
 
-function stub(name) {
-  return function(handler, pool, config) {
-    return function (data)  {
-      console.log('Stub Method: ', name)
-    }
-  }
-}
-
 function changePassword(handler, pool, config) {
   return function (data)  {
     try {
@@ -241,11 +253,11 @@ function changePassword(handler, pool, config) {
         throw new Error('missing prior or new password')
       }
       data.password = data.oldPassword
-      let cognito = getCognitoUser(pool, data, config)
-      let cbHandler = {}
+      var cognito = getCognitoUser(pool, data, config)
+      var cbHandler = {}
       cbHandler = {
-        onSuccess: (result) => {
-          let tokens =
+        onSuccess: function(result) {
+          var tokens =
             { idToken: result.idToken.jwtToken
             , refreshToken: result.refreshToken.token
             , accessToken: result.accessToken.jwtToken
@@ -253,16 +265,16 @@ function changePassword(handler, pool, config) {
           // console.log('JS - Cognito - changePassword success: \n', tokens)
           handler.changePassword.success(tokens)
         },
-        onFailure: (err) => {
+        onFailure: function(err) {
           // console.log('JS - Cognito - changePassword failure: ', err)
           handler.changePassword.failure(err.message)
         },
-        mfaRequired: (codeDeliveryDetails) => {
+        mfaRequired: function(codeDeliveryDetails) {
           // console.log('* mfa: ', codeDeliveryDetails)
           // handler.logIn.mfaRequired(codeDeliveryDetails)
           throw new Error('change password mfa required')
         },
-        newPasswordRequired: (userAttrs, requiredAttrs) => {
+        newPasswordRequired: function(userAttrs, requiredAttrs) {
           // console.log('* requiredAttrs: ', requiredAttrs)
           // delete userAttrs.email_verified
           // delete userAttrs.phone_number_verified
@@ -284,13 +296,13 @@ function confirmRegistration(handler, pool, config) {
   return function (data) {
     // console.log('JS - Cognito - confirmRegistration: ', data)
     try {
-      let userData = {
+      var userData = {
         Username: data.username,
         Pool: pool
       }
-      let cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData)
+      var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData)
 
-      cognitoUser.confirmRegistration(code, true, (err, result) => {
+      cognitoUser.confirmRegistration(code, true, function(err, result) {
         if (err) {
           // console.log('JS - Cognito - confirm error 1: ', ex)
           handler.confirm.error(err.message)
@@ -382,31 +394,24 @@ function confirmRegistration(handler, pool, config) {
 function logIn(handler, pool, config) {
   return function (data) {
     try {
-      console.log('Cognito log in: ', data)
-      // let cognito = getCognitoUser(pool, data, cognito)
-      let cognito = getCognitoUser(pool, data.credentials, config)
-      let cbHandler = {}
+      var cognito = getCognitoUser(pool, data.credentials, config)
+      var cbHandler = {}
       cbHandler = {
-        onSuccess: (result) => {
-          let tokens =
+        onSuccess: function(result) {
+          var tokens =
             { idToken: result.idToken.jwtToken
             , refreshToken: result.refreshToken.token
             , accessToken: result.accessToken.jwtToken
             }
-          // console.log('JS - Cognito - logIn success: \n', tokens)
           handler.logIn.success(tokens)
         },
-        onFailure: (err) => {
-          // console.log('JS - Cognito - logIn failure: ', err)
+        onFailure: function(err) {
           handler.logIn.failure(err.message)
         },
-        mfaRequired: (codeDeliveryDetails) => {
-          // console.log('* mfa: ', codeDeliveryDetails)
+        mfaRequired: function(codeDeliveryDetails) {
           handler.logIn.mfaRequired(''+codeDeliveryDetails)
         },
-        newPasswordRequired: (userAttrs, requiredAttrs) => {
-          // console.log('* requiredAttrs: ', requiredAttrs)
-          console.log (' New Password Required: ', data)
+        newPasswordRequired: function(userAttrs, requiredAttrs) {
           if ( data.newPassword ) {
             delete userAttrs.email_verified
             delete userAttrs.phone_number_verified
@@ -415,16 +420,11 @@ function logIn(handler, pool, config) {
           } else {
             handler.logIn.newPasswordRequired('')
           }
-          
-          
-          // cognito.user.completeNewPasswordChallenge('@Password1', userAttrs, cbHandler)
-          // cognito.user.completeNewPasswordChallenge(data.password, userAttrs, cbHandler)
         }
       }
-      console.log('Calling authenticateUser')
       cognito.user.authenticateUser(cognito.details, cbHandler)
     } catch(ex) {
-      console.log('JS - Cognito - logIn error 2: ', ex)
+      // console.log('JS - Cognito - logIn error 2: ', ex)
       handler.logIn.error(ex.message)
     }
   }
@@ -434,7 +434,7 @@ function logIn(handler, pool, config) {
 function logOut(handler, pool, config) {
   return function(data) {
     try {
-      let cognitoUser = pool.getCurrentUser()
+      var cognitoUser = pool.getCurrentUser()
       if(cognitoUser != null) cognitoUser.signOut()
 
       handler.logOut.success()
@@ -449,11 +449,11 @@ function passwordChallenge(handler, pool, config) {
     try {
       console.log('Cognito password challenge: ', data)
       // let cognito = getCognitoUser(pool, data, cognito)
-      let cognito = getCognitoUser(pool, data.credentials, config)
-      let cbHandler = {}
+      var cognito = getCognitoUser(pool, data.credentials, config)
+      var cbHandler = {}
       completeHandler = {
-        onSuccess: (result) => {
-          let tokens =
+        onSuccess: function(result) {
+          var tokens =
             { idToken: result.idToken.jwtToken
             , refreshToken: result.refreshToken.token
             , accessToken: result.accessToken.jwtToken
@@ -461,14 +461,14 @@ function passwordChallenge(handler, pool, config) {
           // console.log('JS - Cognito - passwordChallenge success: \n', tokens)
           handler.passwordChallenge.success(tokens)
         },
-        onFailure: (err) => {
+        onFailure: function(err) {
           // console.log('JS - Cognito - passwordChallenge failure: ', err)
           handler.passwordChallenge.failure(err.message)
         }
       }
       cbHandler = {
-        onSuccess: (result) => {
-          // let tokens =
+        onSuccess: function(result) {
+          // var tokens =
           //   { idToken: result.idToken.jwtToken
           //   , refreshToken: result.refreshToken.token
           //   , accessToken: result.accessToken.jwtToken
@@ -476,11 +476,11 @@ function passwordChallenge(handler, pool, config) {
           // console.log('JS - Cognito - passwordChallenge success: \n', tokens)
           handler.passwordChallenge.error('User account was already confirmed.')
         },
-        onFailure: (err) => {
+        onFailure: function(err) {
           // console.log('JS - Cognito - passwordChallenge failure: ', err)
           handler.passwordChallenge.failure(err.message)
         },
-        newPasswordRequired: (userAttrs, requiredAttrs) => {
+        newPasswordRequired: function(userAttrs, requiredAttrs) {
           // console.log('* requiredAttrs: ', requiredAttrs)
           delete userAttrs.email_verified
           delete userAttrs.phone_number_verified
@@ -515,7 +515,7 @@ function signUp(handler, pool, config) {
         return new config.cognito.CognitoIdentityServiceProvider.CognitoUserAttribute(attr)
       }
       //pool.signUp(data.username, data.password, attributes.map(toCognitoAttr), null, (err, result) => {
-      pool.signUp(data.username, data.password, attributes.map(cognitoAttributeMap), null, (err, result) => {
+      pool.signUp(data.username, data.password, attributes.map(cognitoAttributeMap), null, function(err, result) {
         if (err) {
           handler.signUp.error(err.message)
           return
